@@ -14,8 +14,12 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Gradle Engine
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
 
-      - name: Build Mod File
-        run: gradle build --no-daemon
+      - name: Generate Wrapper and Build
+        run: |
+          gradle wrapper
+          ./gradlew build --no-daemon
