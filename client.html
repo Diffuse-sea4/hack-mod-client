@@ -3,169 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eaglercraft 1.12.2 Custom Utility Client</title>
+    <title>Tuff-Inspired Custom Eagler Client</title>
     <style>
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; background-color: #111;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        /* The container for the Eaglercraft web game iframe */
-        #game-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* Root game canvas canvas view layout */
+        #canvas-root {
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
             z-index: 1;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        /* Floating Custom Hack Menu GUI Overlay */
+        /* Floating Hack Menu Window GUI Overlay */
         #hack-menu {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 220px;
-            background: rgba(20, 20, 20, 0.85);
-            border: 2px solid #ff4444;
-            border-radius: 6px;
+            top: 30px; left: 30px;
+            width: 240px;
+            background: rgba(15, 15, 15, 0.9);
+            border: 1px solid #00ffcc;
+            border-radius: 8px;
             color: #fff;
-            z-index: 100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: block; /* Visible by default */
+            z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            display: block;
         }
         .menu-header {
-            background: #ff4444;
-            padding: 8px;
-            font-weight: bold;
+            background: #00ffcc;
+            color: #000;
+            padding: 10px;
+            font-weight: 800;
             text-align: center;
-            font-size: 14px;
-            letter-spacing: 1px;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            text-transform: uppercase;
         }
         .menu-content {
-            padding: 10px;
+            padding: 12px;
         }
         .hack-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 13px;
+            font-weight: 600;
         }
-        /* Style toggles */
+        /* Custom Switch Toggles */
         .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
+            position: relative; display: inline-block;
+            width: 36px; height: 18px;
         }
         .switch input { display: none; }
         .slider {
-            position: absolute;
-            cursor: pointer;
+            position: absolute; cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #444;
-            transition: .3s;
-            border-radius: 20px;
+            background-color: #333; transition: .2s;
+            border-radius: 18px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px; width: 14px;
+            position: absolute; content: "";
+            height: 12px; width: 12px;
             left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .3s;
+            background-color: white; transition: .2s;
             border-radius: 50%;
         }
-        input:checked + .slider { background-color: #ff4444; }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider { background-color: #00ffcc; }
+        input:checked + .slider:before { transform: translateX(18px); }
         .footer-note {
-            font-size: 10px;
-            text-align: center;
-            color: #777;
-            margin-top: 10px;
+            font-size: 10px; text-align: center;
+            color: #555; margin-top: 12px;
+            border-top: 1px solid #222; padding-top: 8px;
         }
     </style>
+    <!-- Core runtime packages required to execute Eagler web assets locally -->
+    <script type="text/javascript" src="https://eaglercraft.com"></script>
 </head>
-<body>
+<body style="margin:0px;">
 
-    <!-- Floating Hack Interface Menu -->
+    <!-- ClickGUI Frame Context -->
     <div id="hack-menu">
-        <div class="menu-header">GHOST CLIENT v1.0</div>
+        <div class="menu-header">TUFF GHOST CLIENT</div>
         <div class="menu-content">
             <div class="hack-row">
                 <span>Fly Mod (Client)</span>
                 <label class="switch">
-                    <input type="checkbox" id="flyToggle" onchange="toggleHack('fly')">
+                    <input type="checkbox" id="flyToggle" onchange="applyToggle('fly')">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="hack-row">
-                <span>Speed Boost</span>
+                <span>Speed Multiplier</span>
                 <label class="switch">
-                    <input type="checkbox" id="speedToggle" onchange="toggleHack('speed')">
+                    <input type="checkbox" id="speedToggle" onchange="applyToggle('speed')">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="hack-row">
                 <span>Fullbright Vision</span>
                 <label class="switch">
-                    <input type="checkbox" id="brightToggle" onchange="toggleHack('bright')">
+                    <input type="checkbox" id="brightToggle" onchange="applyToggle('bright')">
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="footer-note">Press [ R.Shift ] to Hide/Show Menu</div>
+            <div class="footer-note">Press [ Right-Shift ] to Toggle GUI</div>
         </div>
     </div>
 
-    <!-- Eaglercraft Live Loader Container -->
-    <div id="game-container">
-        <!-- We use an official public 1.12.2 web client mirror -->
-        <iframe id="eagler-frame" src="https://eaglercraft.com"></iframe>
+    <!-- Active Native Canvas Wrapper Container Layout -->
+    <div id="canvas-root">
+        <canvas id="canvas" style="width:100%; height:100%; border:none;"></canvas>
     </div>
 
-    <script>
-        // Module States
-        const clientModules = {
+    <script type="text/javascript">
+        // Global system state references for functional feature injection hooks
+        const hackState = {
             fly: false,
             speed: false,
             bright: false
         };
 
-        // Handle Toggling Features
-        function toggleHack(moduleName) {
-            clientModules[moduleName] = !clientModules[moduleName];
-            console.log(moduleName + " hack set to: " + clientModules[moduleName]);
+        // Initialize Native Eagler Runtime Client configuration directly in page memory scope
+        window.addEventListener("load", function() {
+            if(typeof main === "function") {
+                // Configure local runtime variables directly bypassing frame isolation rules
+                const eaglerOpts = {
+                    container: "canvas",
+                    assetsURI: "https://eaglercraft.com",
+                    serverList: [
+                        { addr: "wss://://eaglercraft.com", name: "Official Asia Server" },
+                        { addr: "wss://://eaglercraft.com", name: "Official US Server" }
+                    ]
+                };
+                console.log("[Tuff-Client] Launching native canvas assembly context...");
+                // Start the main game context assembly
+                window.main(eaglerOpts);
+            }
+        });
+
+        // Module Memory Manipulation Trigger
+        function applyToggle(hackId) {
+            hackState[hackId] = !hackState[hackId];
+            console.log(`[Tuff-Client] Module updated: ${hackId} is now ${hackState[hackId]}`);
             
-            const iframe = document.getElementById('eagler-frame');
-            if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage({
-                    type: "HACK_UPDATE",
-                    module: moduleName,
-                    enabled: clientModules[moduleName]
-                }, "*");
+            // Intercept running application memory loops directly via global windows objects
+            if(window.Minecraft && window.Minecraft.getMinecraft) {
+                const mcInstance = window.Minecraft.getMinecraft();
+                if(mcInstance && mcInstance.player) {
+                    if(hackId === 'fly') {
+                        mcInstance.player.capabilities.allowFlying = hackState.fly;
+                        mcInstance.player.capabilities.isFlying = hackState.fly;
+                    }
+                }
             }
         }
 
-        // GUI key hook: Detect Right Shift specifically (Key: Shift, Location: 2)
-        window.addEventListener('keydown', function(e) {
-            if (e.key === 'Shift' && e.location === 2) {
-                const menu = document.getElementById('hack-menu');
-                if (menu.style.display === 'none') {
-                    menu.style.display = 'block';
-                } else {
-                    menu.style.display = 'none';
-                }
+        // Catch Right Shift key bind interactions explicitly across page layers
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Shift' && event.location === 2) {
+                const guiElement = document.getElementById('hack-menu');
+                guiElement.style.display = (guiElement.style.display === 'none') ? 'block' : 'none';
             }
         });
     </script>
