@@ -3,172 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tuff-Inspired Custom Eagler Client</title>
+    <title>EaglercraftX 1.12.2 Custom WASM Client</title>
     <style>
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
-            overflow: hidden; background-color: #111;
+            overflow: hidden; background-color: #050505;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-user-select: none; user-select: none;
         }
-        /* Root game canvas canvas view layout */
-        #canvas-root {
+        /* Native WASM WebGL Canvas Container */
+        #game-view {
             width: 100%; height: 100%;
             position: absolute; top: 0; left: 0;
             z-index: 1;
         }
-        /* Floating Hack Menu Window GUI Overlay */
-        #hack-menu {
+        /* Custom UI ClickGUI Framework (Inspired by Tuff/Galactic) */
+        #cheat-hud {
             position: absolute;
-            top: 30px; left: 30px;
-            width: 240px;
-            background: rgba(15, 15, 15, 0.9);
-            border: 1px solid #00ffcc;
-            border-radius: 8px;
-            color: #fff;
-            z-index: 9999;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
-            display: block;
+            top: 25px; left: 25px;
+            width: 250px;
+            background: rgba(10, 10, 10, 0.88);
+            border: 1px solid #00f0ff;
+            border-radius: 10px;
+            color: #ffffff;
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
+            display: block; /* Visible on startup, toggle via R-Shift */
+            transition: opacity 0.15s ease;
         }
-        .menu-header {
-            background: #00ffcc;
+        .hud-title {
+            background: linear-gradient(90deg, #00f0ff, #0077ff);
             color: #000;
-            padding: 10px;
-            font-weight: 800;
+            padding: 12px;
+            font-weight: 900;
             text-align: center;
             font-size: 13px;
-            letter-spacing: 1.5px;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
+            letter-spacing: 2px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
             text-transform: uppercase;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .menu-content {
-            padding: 12px;
+        .hud-body {
+            padding: 15px;
         }
-        .hack-row {
+        .feature-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        /* Custom Switch Toggles */
-        .switch {
+        /* Custom Neon Switch Toggles */
+        .toggle-box {
             position: relative; display: inline-block;
-            width: 36px; height: 18px;
+            width: 42px; height: 20px;
         }
-        .switch input { display: none; }
-        .slider {
+        .toggle-box input { display: none; }
+        .neon-slider {
             position: absolute; cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .2s;
-            border-radius: 18px;
+            background-color: #222; transition: .25s;
+            border-radius: 20px; border: 1px solid #444;
         }
-        .slider:before {
+        .neon-slider:before {
             position: absolute; content: "";
             height: 12px; width: 12px;
-            left: 3px; bottom: 3px;
-            background-color: white; transition: .2s;
+            left: 4px; bottom: 3px;
+            background-color: #fff; transition: .25s;
             border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
         }
-        input:checked + .slider { background-color: #00ffcc; }
-        input:checked + .slider:before { transform: translateX(18px); }
-        .footer-note {
+        input:checked + .neon-slider { 
+            background-color: rgba(0, 240, 255, 0.2); 
+            border-color: #00f0ff;
+        }
+        input:checked + .neon-slider:before { 
+            transform: translateX(20px); 
+            background-color: #00f0ff;
+            box-shadow: 0 0 8px #00f0ff;
+        }
+        .hud-footer {
             font-size: 10px; text-align: center;
-            color: #555; margin-top: 12px;
-            border-top: 1px solid #222; padding-top: 8px;
+            color: #666; margin-top: 14px;
+            border-top: 1px solid #222; padding-top: 10px;
+            font-weight: 500;
         }
     </style>
-    <!-- Core runtime packages required to execute Eagler web assets locally -->
+    
+    <!-- Official EaglercraftX 1.12 WASM-GC Bootstrapper & Ecosystem Libraries -->
     <script type="text/javascript" src="https://eaglercraft.com"></script>
 </head>
-<body style="margin:0px;">
+<body>
 
-    <!-- ClickGUI Frame Context -->
-    <div id="hack-menu">
-        <div class="menu-header">TUFF GHOST CLIENT</div>
-        <div class="menu-content">
-            <div class="hack-row">
-                <span>Fly Mod (Client)</span>
-                <label class="switch">
-                    <input type="checkbox" id="flyToggle" onchange="applyToggle('fly')">
-                    <span class="slider"></span>
+    <!-- Overlay ClickGUI Matrix Interface -->
+    <div id="cheat-hud">
+        <div class="hud-title">WASM Custom Client</div>
+        <div class="hud-body">
+            <div class="feature-item">
+                <span>Flight Mode</span>
+                <label class="toggle-box">
+                    <input type="checkbox" id="mod-fly" onchange="triggerCheat('fly')">
+                    <span class="neon-slider"></span>
                 </label>
             </div>
-            <div class="hack-row">
-                <span>Speed Multiplier</span>
-                <label class="switch">
-                    <input type="checkbox" id="speedToggle" onchange="applyToggle('speed')">
-                    <span class="slider"></span>
+            <div class="feature-item">
+                <span>Speed Boost</span>
+                <label class="toggle-box">
+                    <input type="checkbox" id="mod-speed" onchange="triggerCheat('speed')">
+                    <span class="neon-slider"></span>
                 </label>
             </div>
-            <div class="hack-row">
+            <div class="feature-item">
                 <span>Fullbright Vision</span>
-                <label class="switch">
-                    <input type="checkbox" id="brightToggle" onchange="applyToggle('bright')">
-                    <span class="slider"></span>
+                <label class="toggle-box">
+                    <input type="checkbox" id="mod-bright" onchange="triggerCheat('bright')">
+                    <span class="neon-slider"></span>
                 </label>
             </div>
-            <div class="footer-note">Press [ Right-Shift ] to Toggle GUI</div>
+            <div class="hud-footer">Press [ Right-Shift ] to Toggle GUI</div>
         </div>
     </div>
 
-    <!-- Active Native Canvas Wrapper Container Layout -->
-    <div id="canvas-root">
-        <canvas id="canvas" style="width:100%; height:100%; border:none;"></canvas>
+    <!-- WebGL Canvas Destination Mounting Element -->
+    <div id="game-view">
+        <canvas id="eagler-canvas" style="width:100%; height:100%; border:none;"></canvas>
     </div>
 
     <script type="text/javascript">
-        // Global system state references for functional feature injection hooks
-        const hackState = {
+        // Keep track of which features are enabled
+        const activeCheats = {
             fly: false,
             speed: false,
             bright: false
         };
 
-        // Initialize Native Eagler Runtime Client configuration directly in page memory scope
-        window.addEventListener("load", function() {
-            if(typeof main === "function") {
-                // Configure local runtime variables directly bypassing frame isolation rules
-                const eaglerOpts = {
-                    container: "canvas",
+        // Initialize the EaglercraftX 1.12 WASM-GC Runtime Config
+        window.addEventListener("DOMContentLoaded", function() {
+            // Check if the WASM bootstrap assembly layer is ready
+            if (typeof window.EaglercraftXOpts !== "undefined" || typeof main === "function") {
+                const config = {
+                    container: "eagler-canvas",
                     assetsURI: "https://eaglercraft.com",
-                    serverList: [
-                        { addr: "wss://://eaglercraft.com", name: "Official Asia Server" },
-                        { addr: "wss://://eaglercraft.com", name: "Official US Server" }
+                    wasmURI: "https://eaglercraft.com",
+                    localesURI: "https://eaglercraft.com",
+                    servers: [
+                        { addr: "wss://as.eaglercraft.com/", name: "Official Asia Server" },
+                        { addr: "wss://us.eaglercraft.com/", name: "Official US Server" }
                     ]
                 };
-                console.log("[Tuff-Client] Launching native canvas assembly context...");
-                // Start the main game context assembly
-                window.main(eaglerOpts);
+                console.log("[WASM-Client] Starting EaglercraftX 1.12 WASM-GC runtime container...");
+                
+                // Boot the game directly inside our web frame context safely
+                if(typeof window.main === "function") {
+                    window.main(config);
+                }
             }
         });
 
-        // Module Memory Manipulation Trigger
-        function applyToggle(hackId) {
-            hackState[hackId] = !hackState[hackId];
-            console.log(`[Tuff-Client] Module updated: ${hackId} is now ${hackState[hackId]}`);
+        // Interface Hook Logic to Update Memory/Toggles inside the Game Context
+        function triggerCheat(cheatId) {
+            activeCheats[cheatId] = !activeCheats[cheatId];
+            console.log(`[WASM-Client] ${cheatId} module set to: ${activeCheats[cheatId]}`);
             
-            // Intercept running application memory loops directly via global windows objects
-            if(window.Minecraft && window.Minecraft.getMinecraft) {
-                const mcInstance = window.Minecraft.getMinecraft();
-                if(mcInstance && mcInstance.player) {
-                    if(hackId === 'fly') {
-                        mcInstance.player.capabilities.allowFlying = hackState.fly;
-                        mcInstance.player.capabilities.isFlying = hackState.fly;
+            // Access the running game runtime instances directly via the WASM window exports
+            if (window.EaglerRuntime && window.EaglerRuntime.getMinecraft) {
+                const mc = window.EaglerRuntime.getMinecraft();
+                if (mc && mc.thePlayer) {
+                    if (cheatId === 'fly') {
+                        mc.thePlayer.capabilities.allowFlying = activeCheats.fly;
+                        mc.thePlayer.capabilities.isFlying = activeCheats.fly;
                     }
                 }
             }
         }
 
-        // Catch Right Shift key bind interactions explicitly across page layers
+        // Global Event Hook listener: Listen specifically for Right Shift (Key: Shift, Location: 2)
         window.addEventListener('keydown', function(event) {
             if (event.key === 'Shift' && event.location === 2) {
-                const guiElement = document.getElementById('hack-menu');
-                guiElement.style.display = (guiElement.style.display === 'none') ? 'block' : 'none';
+                const hud = document.getElementById('cheat-hud');
+                if (hud.style.display === 'none') {
+                    hud.style.display = 'block';
+                } else {
+                    hud.style.display = 'none';
+                }
             }
         });
     </script>
 </body>
 </html>
+
