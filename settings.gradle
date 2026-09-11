@@ -1,9 +1,0 @@
-pluginManagement {
-    repositories {
-        maven { url = "https://fabricmc.net" }
-        mavenCentral()
-    }
-}
-plugins {
-    id 'io.fabricmc.loom' version '1.9-SNAPSHOT'
-}

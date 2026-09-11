@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eaglercraft 1.12.2 Custom Utility Client</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* The container for the Eaglercraft web game iframe */
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* Floating Custom Hack Menu GUI Overlay */
+        #hack-menu {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 220px;
+            background: rgba(20, 20, 20, 0.85);
+            border: 2px solid #ff4444;
+            border-radius: 6px;
+            color: #fff;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: block; /* Visible by default */
+        }
+        .menu-header {
+            background: #ff4444;
+            padding: 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 1px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .menu-content {
+            padding: 10px;
+        }
+        .hack-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        /* Style toggles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input { display: none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #444;
+            transition: .3s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #ff4444; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .footer-note {
+            font-size: 10px;
+            text-align: center;
+            color: #777;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Hack Interface Menu -->
+    <div id="hack-menu">
+        <div class="menu-header">GHOST CLIENT v1.0</div>
+        <div class="menu-content">
+            <div class="hack-row">
+                <span>Fly Mod (Client)</span>
+                <label class="switch">
+                    <input type="checkbox" id="flyToggle" onchange="toggleHack('fly')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="hack-row">
+                <span>Speed Boost</span>
+                <label class="switch">
+                    <input type="checkbox" id="speedToggle" onchange="toggleHack('speed')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="hack-row">
+                <span>Fullbright Vision</span>
+                <label class="switch">
+                    <input type="checkbox" id="brightToggle" onchange="toggleHack('bright')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="footer-note">Press [ R.Shift ] to Hide/Show Menu</div>
+        </div>
+    </div>
+
+    <!-- Eaglercraft Live Loader Container -->
+    <div id="game-container">
+        <!-- We use an official public 1.12.2 web client mirror -->
+        <iframe id="eagler-frame" src="https://eaglercraft.com"></iframe>
+    </div>
+
+    <script>
+        // Module States
+        const clientModules = {
+            fly: false,
+            speed: false,
+            bright: false
+        };
+
+        // Handle Toggling Features
+        function toggleHack(moduleName) {
+            clientModules[moduleName] = !clientModules[moduleName];
+            console.log(moduleName + " hack set to: " + clientModules[moduleName]);
+            
+            const iframe = document.getElementById('eagler-frame');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    type: "HACK_UPDATE",
+                    module: moduleName,
+                    enabled: clientModules[moduleName]
+                }, "*");
+            }
+        }
+
+        // GUI key hook: Detect Right Shift specifically (Key: Shift, Location: 2)
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Shift' && e.location === 2) {
+                const menu = document.getElementById('hack-menu');
+                if (menu.style.display === 'none') {
+                    menu.style.display = 'block';
+                } else {
+                    menu.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
